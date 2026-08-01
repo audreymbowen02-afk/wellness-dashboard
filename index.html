@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6b4d65" />
+    <title>Golden Glow | Personal Wellness</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>.logo-showcase{margin:0 4px 16px;padding:2px;background:transparent}.logo-showcase img{display:block;width:100%;height:auto;max-height:85px;object-fit:contain}</style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="logo-showcase"><img src="golden-glow-logo-clean.png" alt="Golden Glow Beauty Boutique logo" /></div>
+        <div class="brand"><span class="brand-mark">✦</span><span>golden glow</span></div>
+        <p class="eyebrow">PERSONAL WELLNESS</p>
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="dashboard"><span>⌂</span>Dashboard</button>
+          <button class="nav-item" data-view="daily"><span>✓</span>Daily rhythm</button>
+          <button class="nav-item" data-view="beauty"><span>✧</span>Beauty care</button>
+          <button class="nav-item" data-view="nutrition"><span>◒</span>Nutrition</button>
+          <button class="nav-item" data-view="fitness"><span>⌁</span>Fitness</button>
+          <button class="nav-item" data-view="emotional"><span>♡</span>Emotional wellness</button>
+          <button class="nav-item" data-view="spiritual"><span>☼</span>Spiritual wellness</button>
+          <button class="nav-item" data-view="growth"><span>↗</span>Personal growth</button>
+          <button class="nav-item" data-view="insights"><span>◔</span>Insights</button>
+          <button class="nav-item" data-view="journey"><span>♕</span>My journey</button>
+        </nav>
+        <div class="sidebar-footer"><span class="avatar">A</span><div><strong>Audrey</strong><small>Building softly</small></div></div>
+      </aside>
+      <main class="content">
+        <header class="topbar">
+          <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+          <div><p id="todayLabel" class="eyebrow"></p><h1 id="pageTitle">Good morning, Audrey</h1></div>
+          <button class="icon-button" id="resetButton" title="Reset sample data">↻</button>
+        </header>
+        <section id="view" class="view" aria-live="polite"></section>
+      </main>
+    </div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
