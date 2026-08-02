@@ -1,3 +1,40 @@
-const journalStoreKey='golden-glow-journal-v1';
-function addDailyJournal(){const root=document.querySelector('#view');if(!root||root.querySelector('#dailyJournal')||root.querySelector('h2')?.textContent!=='Your daily rhythm')return;const store=JSON.parse(localStorage.getItem(journalStoreKey)||'{"days":{}}'),date=new Date().toISOString().slice(0,10),entry=store.days?.[date]||{};root.insertAdjacentHTML('beforeend',`<div class="grid journal-wrap" id="dailyJournal"><article class="card"><h3>Daily journal</h3><p class="card-sub">A private place to notice what matters.</p><div class="field"><label>Today, I am grateful for…</label><textarea id="gratitudeEntry" rows="3" placeholder="Three small things…">${entry.gratitude||''}</textarea></div><div class="field"><label>Journal entry</label><textarea id="journalEntry" rows="7" placeholder="Write freely—how are you feeling, what did you learn, what do you need?"></textarea></div><button class="save-button" id="saveJournalEntry">Save today's journal</button></article></div>`);document.querySelector('#journalEntry').value=entry.journal||'';document.querySelector('#saveJournalEntry').onclick=()=>{const all=JSON.parse(localStorage.getItem(journalStoreKey)||'{"days":{}}');all.days=all.days||{};all.days[date]=all.days[date]||{water:0,meals:{breakfast:'',lunch:'',dinner:'',snacks:''},exercises:[]};all.days[date].gratitude=document.querySelector('#gratitudeEntry').value.trim();all.days[date].journal=document.querySelector('#journalEntry').value.trim();localStorage.setItem(journalStoreKey,JSON.stringify(all));document.querySelector('#saveJournalEntry').textContent='✓ Saved locally';setTimeout(()=>document.querySelector('#saveJournalEntry').textContent="Save today's journal",1500)}}
-new MutationObserver(addDailyJournal).observe(document.querySelector('#view'),{childList:true});addDailyJournal();
+function addDailyJournal() {
+  const root = document.querySelector('#view');
+  if (!root || root.querySelector('#dailyJournal') || root.querySelector('h2')?.textContent !== 'Your daily rhythm') return;
+
+  const date = new Date().toISOString().slice(0, 10);
+  const entry = record(date);
+
+  root.insertAdjacentHTML('beforeend', `
+    <div class="grid journal-wrap" id="dailyJournal">
+      <article class="card">
+        <h3>Daily journal</h3>
+        <p class="card-sub">A private place to notice what matters.</p>
+        <div class="field">
+          <label for="gratitudeEntry">Today, I am grateful for…</label>
+          <textarea id="gratitudeEntry" rows="3" placeholder="Three small things…">${esc(entry.gratitude || '')}</textarea>
+        </div>
+        <div class="field">
+          <label for="journalEntry">Journal entry</label>
+          <textarea id="journalEntry" rows="7" placeholder="Write freely—how are you feeling, what did you learn, what do you need?">${esc(entry.journal || '')}</textarea>
+        </div>
+        <button class="save-button" id="saveJournalEntry">Save today's journal</button>
+      </article>
+    </div>
+  `);
+
+  const saveButton = document.querySelector('#saveJournalEntry');
+  saveButton.onclick = () => {
+    const current = record(date);
+    current.gratitude = document.querySelector('#gratitudeEntry').value.trim();
+    current.journal = document.querySelector('#journalEntry').value.trim();
+    saveJournal();
+    saveButton.textContent = '✓ Saved locally';
+    setTimeout(() => {
+      if (document.body.contains(saveButton)) saveButton.textContent = "Save today's journal";
+    }, 1500);
+  };
+}
+
+new MutationObserver(addDailyJournal).observe(document.querySelector('#view'), { childList: true });
+addDailyJournal();
