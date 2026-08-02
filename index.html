@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-    <style>.logo-showcase{margin:0 4px 16px;padding:2px;background:transparent}.logo-showcase img{display:block;width:100%;height:auto;max-height:85px;object-fit:contain}</style>
+    <style>.logo-showcase{margin:0 4px 16px;padding:2px;background:transparent}.logo-showcase img{display:block;width:100%;height:auto;max-height:85px;object-fit:contain}.sidebar-footer{width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:left;cursor:pointer}</style>
   </head>
   <body>
     <div class="app-shell">
@@ -29,12 +29,12 @@
           <button class="nav-item" data-view="insights"><span>◔</span>Insights</button>
           <button class="nav-item" data-view="journey"><span>♕</span>My journey</button>
         </nav>
-        <div class="sidebar-footer"><span class="avatar">A</span><div><strong>Audrey</strong><small>Building softly</small></div></div>
+        <button class="sidebar-footer" id="changeNameButton" title="Change your display name"><span class="avatar" id="avatarInitial">A</span><span><strong id="profileName">Audrey</strong><small>Tap to personalise</small></span></button>
       </aside>
       <main class="content">
         <header class="topbar">
           <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
-          <div><p id="todayLabel" class="eyebrow"></p><h1 id="pageTitle">Good morning, Audrey</h1></div>
+          <div><p id="todayLabel" class="eyebrow"></p><h1 id="pageTitle">Good morning</h1></div>
           <button class="icon-button" id="resetButton" title="Reset sample data">↻</button>
         </header>
         <section id="view" class="view" aria-live="polite"></section>
