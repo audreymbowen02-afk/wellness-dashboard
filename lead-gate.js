@@ -32,6 +32,20 @@
     return;
   }
 
+  form.addEventListener('submit', (event) => {
+    const captchaComplete = Boolean(window.grecaptcha?.getResponse?.());
+    if (captchaComplete) return;
+    event.preventDefault();
+    window.setTimeout(() => {
+      const captchaError = document.querySelector('#sib-captcha + .entry__error');
+      if (captchaError) {
+        captchaError.textContent = "Please complete the ‘I'm not a robot’ check.";
+        captchaError.style.display = 'block';
+      }
+    });
+    document.getElementById('sib-captcha')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, true);
+
   new MutationObserver(() => {
     if (success.classList.contains('sib-form-message-panel--active') || getComputedStyle(success).display !== 'none') saveLeadAccess();
   }).observe(success, { attributes: true, childList: true, subtree: true });
