@@ -1,6 +1,7 @@
 (function () {
   const accessKey = 'golden-glow-lead-access-v1';
   const wellnessKey = 'golden-glow-wellness-v1';
+  const showHomeKey = 'golden-glow-show-home-panel';
   const gate = document.getElementById('leadGate');
   const form = document.getElementById('sib-form');
   const success = document.getElementById('success-message');
@@ -15,6 +16,10 @@
   function showApp() {
     document.body.classList.remove('lead-locked');
     gate.hidden = true;
+    if (sessionStorage.getItem(showHomeKey) === '1') {
+      sessionStorage.removeItem(showHomeKey);
+      document.getElementById('sidebar')?.classList.add('open');
+    }
   }
 
   function saveLeadAccess() {
@@ -26,7 +31,16 @@
       const wellness = JSON.parse(localStorage.getItem(wellnessKey) || 'null');
       if (wellness) localStorage.setItem(wellnessKey, JSON.stringify({ ...wellness, name }));
     } catch {}
+    sessionStorage.setItem(showHomeKey, '1');
     window.setTimeout(() => location.reload(), 900);
+  }
+
+  function responseSucceeded(payload) {
+    return payload?.success === true || payload?.status === 'success';
+  }
+
+  function responseMessage(payload) {
+    return payload?.message || payload?.error || 'Brevo did not confirm this registration. Please check the information and try again.';
   }
 
   if (readAccess()) {
@@ -52,16 +66,18 @@
     submitButton.textContent = 'Unlocking…';
 
     try {
-      const response = await fetch(form.action, {
+      const response = await fetch(`${form.action}?isAjax=1`, {
         method: 'POST',
         body: new FormData(form),
         headers: { Accept: 'application/json' }
       });
       if (!response.ok) throw new Error(`Brevo returned ${response.status}`);
+      const payload = await response.json();
+      if (!responseSucceeded(payload)) throw new Error(responseMessage(payload));
       success.classList.add('sib-form-message-panel--active');
       saveLeadAccess();
-    } catch {
-      error.querySelector('.sib-form-message-panel__inner-text').textContent = 'Your registration could not be completed. Please check your connection and try again.';
+    } catch (submissionError) {
+      error.querySelector('.sib-form-message-panel__inner-text').textContent = submissionError.message || 'Your registration could not be completed. Please check your connection and try again.';
       error.classList.add('sib-form-message-panel--active');
       submitButton.disabled = false;
       submitButton.textContent = 'Unlock my Wellness App';
@@ -69,7 +85,4 @@
     }
   });
 
-  new MutationObserver(() => {
-    if (success.classList.contains('sib-form-message-panel--active') || getComputedStyle(success).display !== 'none') saveLeadAccess();
-  }).observe(success, { attributes: true, childList: true, subtree: true });
 })();
