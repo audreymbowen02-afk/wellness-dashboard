@@ -116,7 +116,9 @@
 
   window.openFeedback = () => {
     const access = read(accessKey) || {};
-    openModal('Send feedback', `<p>Your feedback helps improve Golden Glow. No wellness entries are included.</p><form id="feedbackForm"><label>Overall rating<select name="rating" required><option value="">Choose 1–5</option><option>5 - Excellent</option><option>4 - Good</option><option>3 - Fair</option><option>2 - Difficult</option><option>1 - Poor</option></select></label><label>Feedback type<select name="feedback_type" required><option value="">Choose one</option><option>What is working well</option><option>Problem or bug</option><option>Suggested improvement</option><option>Other</option></select></label><label>Your feedback<textarea name="message" rows="5" required></textarea></label><label>Email for a reply (optional)<input name="email" type="email" value="${String(access.email || '').replace(/[&<>"]/g, '')}"></label><p class="privacy-error" id="feedbackError" role="alert"></p><div class="modal-actions"><button class="text-button" id="cancelFeedback" type="button">Cancel</button><button class="lead-submit" id="sendFeedback" type="submit">Send feedback</button></div></form>`);
+    const safeName = String(access.name || 'Friend').replace(/[&<>"]/g, '');
+    const safeEmail = String(access.email || '').replace(/[&<>"]/g, '');
+    openModal('Send feedback', `<p>Your feedback helps improve Golden Glow. No wellness entries are included.</p><form id="feedbackForm"><input type="hidden" name="name" value="${safeName}"><label>Overall rating<select name="rating" required><option value="">Choose 1–5</option><option>5 - Excellent</option><option>4 - Good</option><option>3 - Fair</option><option>2 - Difficult</option><option>1 - Poor</option></select></label><label>Feedback type<select name="feedback_type" required><option value="">Choose one</option><option>What is working well</option><option>Problem or bug</option><option>Suggested improvement</option><option>Other</option></select></label><label>Your feedback<textarea name="message" rows="5" required></textarea></label><label>Email for a reply<input name="email" type="email" value="${safeEmail}" required></label><p class="privacy-error" id="feedbackError" role="alert"></p><div class="modal-actions"><button class="text-button" id="cancelFeedback" type="button">Cancel</button><button class="lead-submit" id="sendFeedback" type="submit">Send feedback</button></div></form>`);
     document.getElementById('cancelFeedback').onclick = closeModal;
     document.getElementById('feedbackForm').onsubmit = async event => {
       event.preventDefault();
@@ -125,7 +127,11 @@
       button.textContent = 'Sending…';
       try {
         const response = await fetch(feedbackEndpoint, { method: 'POST', body: new FormData(event.target), headers: { Accept: 'application/json' } });
-        if (!response.ok) throw new Error('Feedback could not be sent. Please try again.');
+        const result = await response.json().catch(() => null);
+        if (!response.ok) {
+          const details = result?.errors?.map(item => item.message).filter(Boolean).join(' ') || result?.error;
+          throw new Error(details || 'Feedback could not be sent. Please try again.');
+        }
         openModal('Thank you', '<p>Your feedback was sent successfully.</p><button class="lead-submit" id="closeThanks" type="button">Return to app</button>');
         document.getElementById('closeThanks').onclick = closeModal;
       } catch (error) {
