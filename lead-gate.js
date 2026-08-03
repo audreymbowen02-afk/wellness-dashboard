@@ -4,6 +4,8 @@
   const gate = document.getElementById('leadGate');
   const form = document.getElementById('sib-form');
   const success = document.getElementById('success-message');
+  const error = document.getElementById('error-message');
+  const submitButton = form.querySelector('.lead-submit');
 
   function readAccess() {
     try { return JSON.parse(localStorage.getItem(accessKey) || 'null'); }
@@ -32,19 +34,40 @@
     return;
   }
 
-  form.addEventListener('submit', (event) => {
-    const captchaComplete = Boolean(window.grecaptcha?.getResponse?.());
-    if (captchaComplete) return;
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    window.setTimeout(() => {
+    const captchaComplete = Boolean(window.grecaptcha?.getResponse?.());
+    if (!captchaComplete) {
       const captchaError = document.querySelector('#sib-captcha + .entry__error');
       if (captchaError) {
         captchaError.textContent = "Please complete the ‘I'm not a robot’ check.";
         captchaError.style.display = 'block';
       }
-    });
-    document.getElementById('sib-captcha')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, true);
+      document.getElementById('sib-captcha')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    error.classList.remove('sib-form-message-panel--active');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Unlocking…';
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`Brevo returned ${response.status}`);
+      success.classList.add('sib-form-message-panel--active');
+      saveLeadAccess();
+    } catch {
+      error.querySelector('.sib-form-message-panel__inner-text').textContent = 'Your registration could not be completed. Please check your connection and try again.';
+      error.classList.add('sib-form-message-panel--active');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Unlock my Wellness App';
+      window.grecaptcha?.reset?.();
+    }
+  });
 
   new MutationObserver(() => {
     if (success.classList.contains('sib-form-message-panel--active') || getComputedStyle(success).display !== 'none') saveLeadAccess();
